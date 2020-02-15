@@ -20,7 +20,5 @@ try:
     for price in prices:
         print(price.get_text())
 
-
-
 except ConnectionError:
     print('拒绝连接')
