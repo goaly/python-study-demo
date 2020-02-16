@@ -40,7 +40,7 @@ def get_info(url):
     names = soup.select('#floatRightBox > div.js_box.clearfix > div.w_240 > h6 > a')
     sexs = soup.select('#floatRightBox > div.js_box.clearfix > div.member_pic > div')
 
-    #用zip() 函数将以上不同类别的信息集合打包成一个元组对象
+    # 用zip() 函数将以上不同类别的信息集合打包成一个元组对象
     for title, address, price, img, name, sex in zip(titles, addresses, prices, imgs, names, sexs):
         # 获取信息并通过字典的信息打印
         data = {'title': title.get_text().strip(), 'address': address.get_text().strip(), 'price': price.get_text(),
