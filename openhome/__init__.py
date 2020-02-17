@@ -1,0 +1,1 @@
+# 在文件夹中包含一个__init__.py，Python就会把文件夹当作一个package，里面的py文件就能够在外面被import了。
