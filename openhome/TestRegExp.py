@@ -17,3 +17,7 @@ print(re2)
 phone = '132-0711-3160'
 newPhone = re.sub('\D+', '', phone)
 print(newPhone)
+
+result = re.search('All contents are copyrighted',
+                 '2018-2019&nbsp;&copy;&nbsp;所有内容版权归原作者所有 / All contents are copyrighted by their respective authors. <br/> Powered by <a target="_blank" href="/">斗破小说网</a>', re.I)
+print(result is None)
