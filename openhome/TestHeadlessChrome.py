@@ -56,7 +56,7 @@ try:
         driver.save_screenshot(
             'D:/360极速浏览器下载/screenshot_' + datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S.%f') + '.png')
 
-    print(driver.page_source,'\n')
+    print(driver.page_source, '\n')
 
     infos = driver.find_elements_by_xpath('//div[@class="item-root"]/div[@class="detail"]')
     for info in infos:
