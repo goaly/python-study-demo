@@ -177,8 +177,9 @@ try:
         sheet.col(i).width = col_w
     workbook.save('D:/360极速浏览器下载/pythonBookTop100_' + now_time_stamp + '.xls')
 
-except NoSuchElementException as ex:
-    print('未找到对应元素：', ex.msg)
-
-# 退出浏览器
-driver.quit()
+    # 退出浏览器
+    driver.quit()
+except Exception as ex:
+    print('爬取豆瓣搜索中前100名Python图书失败：', ex.msg)
+    # 退出浏览器
+    driver.quit()
