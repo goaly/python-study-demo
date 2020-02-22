@@ -132,8 +132,8 @@ try:
     sheetdata = []
 
     # 得到执行完js的代码True
-    with open('pageSource.html', 'w', encoding='utf8') as fp:
-        fp.write(driver.page_source)
+    # with open('pageSource.html', 'w', encoding='utf8') as fp:
+    #     fp.write(driver.page_source)
 
     # maximize_window()
     # 截屏
