@@ -63,7 +63,7 @@ def get_curpage_data():
     for info in infos:
         str_book_info = info.find_element_by_xpath('div[@class="meta abstract"]').text
         book_infos = str_book_info.split('/')
-        if len(book_infos) < 5:
+        if len(book_infos) < 4:
             continue
 
         title = info.find_element_by_xpath('div[@class="title"]/a')
@@ -72,11 +72,13 @@ def get_curpage_data():
 
         author = book_infos[0]
         price = book_infos[-1]
-        if re.search('CNY', price, re.I) or price.find('元'):
+        if re.search('CNY', price, re.I) is not None or price.find('元') > -1:
             # 人民币价格，去除非数值信息
             price = re.sub('[^\d\.]+', '', price)
         pub_date = book_infos[-2]
-        publisher = book_infos[-3]
+        publisher = ''
+        if len(book_infos) == 5:
+            publisher = book_infos[-3]
         rate = info.find_element_by_xpath('div[2]/span[2]').text
         comment_num = info.find_element_by_xpath('div[2]/span[3]').text
 
@@ -133,7 +135,7 @@ try:
     with open('pageSource.html', 'w', encoding='utf8') as fp:
         fp.write(driver.page_source)
 
-    maximize_window()
+    # maximize_window()
     # 截屏
     # driver.save_screenshot(
     #     'D:/360极速浏览器下载/screenshot_' + now_time_stamp + '.png')

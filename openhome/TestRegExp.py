@@ -26,7 +26,9 @@ new_price1 = re.sub('[^\d\.]+', '', price1)
 print(new_price1)
 
 price2 = 'CNY 69.00'
-if re.search('CNY', price2, re.I):
+re_search = re.search('CNY', price2, re.I)
+print('re_search', re_search)
+if re_search is not None:
     print(price2)
 new_price2 = re.sub('[^\d\.]+', '', price2)
 print(new_price2)
