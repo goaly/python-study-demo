@@ -1,3 +1,5 @@
+'''爬取豆瓣搜索中前100名Python图书'''
+
 import xlwt
 import re
 import datetime
@@ -154,7 +156,8 @@ try:
                         col_widths[j] = new_col_w
                     if cellData.startswith("http://") or cellData.startswith("https://"):
                         # 超链接
-                        sheet.write(rowIdx, j, xlwt.Formula('HYPERLINK("' + cellData + '";"' + cellData + '")'), style_link_color)
+                        sheet.write(rowIdx, j, xlwt.Formula('HYPERLINK("' + cellData + '";"' + cellData + '")'),
+                                    style_link_color)
                     else:
                         sheet.write(rowIdx, j, cellData)
                 rowIdx += 1
