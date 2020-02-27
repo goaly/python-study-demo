@@ -1,6 +1,10 @@
 import re
 
 # 测试正则表达式
+d = '20200227'
+m = re.fullmatch('\d{8}', d)
+print(m)
+
 a = 'xxIxxfsdaxxlovexxijrexxPythonxx'
 
 infos = re.findall('xx(.*?)xx', a)
