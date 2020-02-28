@@ -1,8 +1,11 @@
+import datetime
 import re
+import uuid
+
 import xlrd
 import pymysql
 
-conn = pymysql.connect(host='localhost', user='root', passwd='L4g56', db='dailylog', port=3306, charset='utf8')
+conn = pymysql.connect(host='localhost', user='root', passwd='Al4g56', db='dailylog', port=3306, charset='utf8')
 
 
 def list_dic(list1, list2):
@@ -82,7 +85,18 @@ class WorkLogTool:
     def save_to_db(self, log_datas):
         if len(log_datas) > 0:
             cursor = conn.cursor()
+            handler = '刘勇顺'
+            cur_userid = 1
+            curtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             for log_data in log_datas:
+                uid = str(uuid.uuid4())
+                suid = ''.join(uid.split('-'))
                 cursor.execute(
-                    "INSERT INTO worklog(createdBy, createdOn, modifiedBy, modifiedOn, workDate, workWeek, tasksToday, taskNo, hours,"
-                    "progress, nextDayArrange, handler, uuid) VALUES ()")
+                    "INSERT INTO worklog(createdBy, createdOn, modifiedBy, modifiedOn, workDate, workWeek, tasksToday, "
+                    + "taskNo, hours, progress, nextDayArrange, handler, uuid) "
+                    + "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    # 数据元组
+                    (cur_userid, curtime, cur_userid, curtime, log_data['workDate'], log_data['workWeek'],
+                     log_data['tasksToday'], log_data['taskNo'], log_data['hours'], log_data['progress'],
+                     log_data['nextDayArrange'], handler, suid))
+            conn.commit()
