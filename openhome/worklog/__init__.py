@@ -50,10 +50,12 @@ class WorkLogTool:
     def get_excel(self, filepath):
         apply_dic = []
         if filepath:
+            filename = filepath.split('\\')[-1]
+            handler = filename.split('_')[0]
             workbook = xlrd.open_workbook(filepath)
             sheet_info = workbook.sheet_by_index(0)
             # first_line = sheet_info.row_values(0)  # 获取首行，这里的首行是表头，用表头作为字典的key，每一行数据对应表头的value，每一行组成一个字典
-            first_line = ['workDate', 'workWeek', 'tasksToday', 'taskNo', 'hours', 'progress', 'nextDayArrange']
+            first_line = ['workDate', 'workWeek', 'tasksToday', 'taskNo', 'hours', 'progress', 'nextDayArrange', 'handler', 'filename']
 
             values_merge_cell = merge_cell(sheet_info)  # 调用处理合并单元格的函数
             for i in range(1, sheet_info.nrows):  # 遍历表格行数据，从第二行开始
@@ -63,8 +65,10 @@ class WorkLogTool:
                         other_line[key[1]] = values_merge_cell[key]
                 # print(other_line)
                 dic = list_dic(first_line, other_line)  # 调用组合字典的函数，传入key和value，字典生成
+                dic['handler'] = handler
+                dic['filename'] = filename
                 apply_dic.append(dic)
-            return apply_dic
+        return apply_dic
 
     def format_data(self, excel_data):
         fmt_data = []
@@ -85,7 +89,6 @@ class WorkLogTool:
     def save_to_db(self, log_datas):
         if len(log_datas) > 0:
             cursor = conn.cursor()
-            handler = '刘勇顺'
             cur_userid = 1
             curtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             for log_data in log_datas:
@@ -93,10 +96,10 @@ class WorkLogTool:
                 suid = ''.join(uid.split('-'))
                 cursor.execute(
                     "INSERT INTO worklog(createdBy, createdOn, modifiedBy, modifiedOn, workDate, workWeek, tasksToday, "
-                    + "taskNo, hours, progress, nextDayArrange, handler, uuid) "
-                    + "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    + "taskNo, hours, progress, nextDayArrange, handler, fileName, uuid) "
+                    + "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                     # 数据元组
                     (cur_userid, curtime, cur_userid, curtime, log_data['workDate'], log_data['workWeek'],
                      log_data['tasksToday'], log_data['taskNo'], log_data['hours'], log_data['progress'],
-                     log_data['nextDayArrange'], handler, suid))
+                     log_data['nextDayArrange'], log_data['handler'], log_data['filename'], suid))
             conn.commit()
