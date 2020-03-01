@@ -5,8 +5,6 @@ import uuid
 import xlrd
 import pymysql
 
-conn = pymysql.connect(host='localhost', user='root', passwd='Al4g56', db='dailylog', port=3306, charset='utf8')
-
 
 def list_dic(list1, list2):
     '''
@@ -47,15 +45,36 @@ def merge_cell(sheet_info):
 # 工作日志工具
 class WorkLogTool:
 
+    def __init__(self) -> None:
+        super().__init__()
+        self.conn = pymysql.connect(host='localhost', user='root', passwd='Al4g56', db='dailylog', port=3306,
+                                    charset='utf8')
+
+    def get_filename(self, filepath):
+        # 解析文件名
+        filename = filepath.split('\\')[-1]
+        return filename
+
+    def get_handler(self, filename):
+        # 从文件名解析处理人名称
+        handler = re.sub('工作日志', '', filename.split('.')[0])
+        handler = re.sub('\d+', '', handler)
+        handler = re.sub('[-_~]+', '', handler)
+        return handler
+
     def get_excel(self, filepath):
         apply_dic = []
         if filepath:
-            filename = filepath.split('\\')[-1]
-            handler = filename.split('_')[0]
+            filename = self.get_filename(filepath)
+            # 根据文件名到数据库查询是否有记录，若有记录要先清除
+            self.clear_old_record(filename)
+
+            handler = self.get_handler(filename)
             workbook = xlrd.open_workbook(filepath)
             sheet_info = workbook.sheet_by_index(0)
             # first_line = sheet_info.row_values(0)  # 获取首行，这里的首行是表头，用表头作为字典的key，每一行数据对应表头的value，每一行组成一个字典
-            first_line = ['workDate', 'workWeek', 'tasksToday', 'taskNo', 'hours', 'progress', 'nextDayArrange', 'handler', 'filename']
+            first_line = ['workDate', 'workWeek', 'tasksToday', 'taskNo', 'hours', 'progress', 'nextDayArrange',
+                          'handler', 'filename']
 
             values_merge_cell = merge_cell(sheet_info)  # 调用处理合并单元格的函数
             for i in range(1, sheet_info.nrows):  # 遍历表格行数据，从第二行开始
@@ -88,7 +107,7 @@ class WorkLogTool:
 
     def save_to_db(self, log_datas):
         if len(log_datas) > 0:
-            cursor = conn.cursor()
+            cursor = self.conn.cursor()
             cur_userid = 1
             curtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             for log_data in log_datas:
@@ -102,4 +121,16 @@ class WorkLogTool:
                     (cur_userid, curtime, cur_userid, curtime, log_data['workDate'], log_data['workWeek'],
                      log_data['tasksToday'], log_data['taskNo'], log_data['hours'], log_data['progress'],
                      log_data['nextDayArrange'], log_data['handler'], log_data['filename'], suid))
-            conn.commit()
+
+            self.conn.commit()
+            print('======================成功新增%d条日志记录' % len(log_datas))
+
+    def clear_old_record(self, filename):
+        # 根据文件名到数据库查询是否有记录，若有记录要先清除
+        if filename is not None and filename.strip() != '':
+            cursor = self.conn.cursor()
+            sql = "DELETE FROM worklog WHERE fileName = %s"
+            result = cursor.execute(sql, filename)
+            if result > 0:
+                print('======================根据文件名"%s"删除了%d条旧数据' % (filename, result))
+            self.conn.commit()
