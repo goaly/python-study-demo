@@ -1,4 +1,5 @@
 import datetime
+import os
 import re
 import uuid
 
@@ -49,6 +50,30 @@ class WorkLogTool:
         super().__init__()
         self.conn = pymysql.connect(host='localhost', user='root', passwd='Al4g56', db='dailylog', port=3306,
                                     charset='utf8')
+
+    def save_all_excel_to_db(self, dirpath):
+        filepath_lst = []
+        try:
+            for file in os.listdir(dirpath):
+                if os.path.splitext(file)[1] == '.xlsx' and not file.startswith('~$'):  # 过滤掉~$开头的临时文件
+                    fpath = os.path.join(dirpath, file)
+                    print(fpath)
+                    filepath_lst.append(fpath)
+        except NotADirectoryError:
+            print(dirpath)
+            filepath_lst.append(dirpath)
+            pass  # pass掉NotADirectoryError错误
+
+        for filepath in filepath_lst:
+            self.save_excel_to_db(filepath)
+
+    def save_excel_to_db(self, filepath):
+        # 组装业务方法，将excel数据保存到数据库
+        filename = self.get_filename(filepath)
+        excel_data = self.get_excel(filepath)
+        fmt_data = self.format_data(excel_data)
+        self.clear_old_record(filename)
+        self.save_to_db(fmt_data)
 
     def get_filename(self, filepath):
         # 解析文件名
