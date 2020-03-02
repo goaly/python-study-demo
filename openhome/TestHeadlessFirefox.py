@@ -24,6 +24,9 @@ driver = webdriver.Firefox(firefox_binary=binary, capabilities=caps, timeout=60)
 # driver.get("https://www.baidu.com")
 driver.get("https://search.douban.com/book/subject_search?search_text=python&cat=1001&start=0")
 
+# 爬取页数
+pageCount = 7
+
 # 隐式等待
 driver.implicitly_wait(10)
 
@@ -79,8 +82,14 @@ def get_curpage_data():
         publisher = ''
         if len(book_infos) == 5:
             publisher = book_infos[-3]
-        rate = info.find_element_by_xpath('div[2]/span[2]').text
-        comment_num = info.find_element_by_xpath('div[2]/span[3]').text
+        rating_sub_spans = info.find_elements_by_xpath('div[2]/span')
+        if len(rating_sub_spans) == 3:
+            rate = info.find_element_by_xpath('div[2]/span[2]').text
+            comment_num = info.find_element_by_xpath('div[2]/span[3]').text
+        else:
+            # 评论人数不足
+            rate = ''
+            comment_num = info.find_element_by_xpath('div[2]/span[2]').text
 
         print(name, url, author, publisher, pub_date, price, rate, comment_num)
         info_data = [name, url, author, publisher, pub_date, price, rate, comment_num]
@@ -103,8 +112,6 @@ def get_col_width(txt):
 
 
 try:
-    # 爬取页数
-    pageCount = 7
     headers = ['书名', '链接', '作者', '出版社', '出版日期', '价格', '得分', '评价人数']
     col_default_w = 256 * 11
     col_widths = [col_default_w, col_default_w, col_default_w, col_default_w, col_default_w, col_default_w,
@@ -135,10 +142,10 @@ try:
     # with open('pageSource.html', 'w', encoding='utf8') as fp:
     #     fp.write(driver.page_source)
 
-    # maximize_window()
+    maximize_window()
     # 截屏
-    # driver.save_screenshot(
-    #     'D:/360极速浏览器下载/screenshot_' + now_time_stamp + '.png')
+    driver.save_screenshot(
+        'D:/360极速浏览器下载/screenshot_' + now_time_stamp + '.png')
 
     # 打印网页源代码
     # print(driver.page_source, '\n')
@@ -183,5 +190,6 @@ try:
     driver.quit()
 except Exception as ex:
     print('爬取豆瓣搜索中前100名Python图书失败：', ex.msg)
+    print(ex)
     # 退出浏览器
     driver.quit()
