@@ -53,7 +53,7 @@ try:
     link_clock_in = driver.find_element_by_xpath("//a[@title='ZKH每日健康打卡']")
     link_clock_in.click()
     print('==============点击“ZKH每日健康打卡”')
-    time.sleep(3)
+    time.sleep(5)
     handles = driver.window_handles  # 获取当前窗口句柄集合（列表类型）
     driver.switch_to.window(handles[1])  # 切换到新的网页窗口
     print('==============切换到新的网页窗口')
@@ -74,14 +74,14 @@ try:
     # 可到办公室上班时间
     print('填写可到办公室上班时间...')
     driver.find_element_by_xpath("//div[@id='weaSelect_2']").click()
-    time.sleep(2)
+    time.sleep(1)
     driver.find_element_by_xpath("//li[@title='复工时间待定'][@role='menuitem']").click()
     time.sleep(1)
 
     # 目前上班形式
     print('填写目前上班形式...')
     driver.find_element_by_xpath("//div[@id='weaSelect_3']").click()
-    time.sleep(2)
+    time.sleep(1)
     driver.find_element_by_xpath("//li[@title='居家办公'][@role='menuitem']").click()
     time.sleep(1)
 
@@ -93,24 +93,19 @@ try:
     # 不能去办公室现场办公的原因
     print('填写不能去办公室现场办公的原因...')
     driver.find_element_by_xpath("//div[@id='weaSelect_4']").click()
-    time.sleep(2)
+    time.sleep(1)
     driver.find_element_by_xpath("//li[@title='已返回-工作地办公室不允许上班'][@role='menuitem']").click()
     time.sleep(1)
 
     # 目前健康状况--无症状
     print('填写目前健康状况...')
-    driver.find_element_by_xpath("//div[@class='field11037_swapDiv']").click()
+    driver.find_element_by_css_selector(".field11037_swapDiv").click()
     time.sleep(1)
-
     print('==============表单填写完毕')
 
-    # 提交
-    # frmmain = driver.find_element_by_xpath("//form[@name='frmmain']")
-    # frmmain.submit()
-
-    # btn_submit = driver.find_element_by_xpath("//button[@title='提交']")
-    # btn_submit.click()
-    # print('==============表单已提交')
+    btn_submit = driver.find_element_by_xpath("//button[@title='提交']")
+    btn_submit.click()
+    print('==============表单已提交')
 
 except Exception as ex:
     print(ex)
