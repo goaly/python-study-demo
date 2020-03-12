@@ -1,6 +1,7 @@
 '''自动打卡测试'''
 import re
 import datetime
+import json
 import time
 from selenium import webdriver
 # 引入ActionChains类
@@ -26,10 +27,21 @@ try:
     # 隐式等待
     driver.implicitly_wait(3)
 
-    username = driver.find_element_by_css_selector('input#username.login_input')
-    password = driver.find_element_by_css_selector('input#password.login_input')
-    username.send_keys('yongshun.liu')
-    password.send_keys('lys452016_')
+    input_username = driver.find_element_by_css_selector('input#username.login_input')
+    input_password = driver.find_element_by_css_selector('input#password.login_input')
+
+    uname = ''
+    pwd = ''
+    with open('autoClockInCfg.json') as cfg:
+        json_cfg = json.load(cfg)
+        uname = json_cfg['username']
+        pwd = json_cfg['password']
+
+    if uname.strip() == '' or pwd.strip() == '':
+        raise ValueError('用户或密码为空！')
+
+    input_username.send_keys(uname)
+    input_password.send_keys(pwd)
     driver.find_element_by_css_selector('button#loginButton').click()
     print('==============安全中心登录成功')
     driver.implicitly_wait(8)
@@ -53,10 +65,11 @@ try:
     link_clock_in = driver.find_element_by_xpath("//a[@title='ZKH每日健康打卡']")
     link_clock_in.click()
     print('==============点击“ZKH每日健康打卡”')
-    time.sleep(5)
+    time.sleep(2)
     handles = driver.window_handles  # 获取当前窗口句柄集合（列表类型）
     driver.switch_to.window(handles[1])  # 切换到新的网页窗口
     print('==============切换到新的网页窗口')
+    time.sleep(3)
 
     print('==============开始填写表单')
     # 目前所在地
@@ -67,7 +80,7 @@ try:
     # 是否已回工作地
     print('填写是否已回工作地...')
     driver.find_element_by_xpath("//div[@id='weaSelect_1']").click()
-    time.sleep(2)
+    time.sleep(4)
     driver.find_element_by_xpath("//li[@title='是'][@role='menuitem']").click()
     time.sleep(1)
 
@@ -105,6 +118,7 @@ try:
 
     btn_submit = driver.find_element_by_xpath("//button[@title='提交']")
     btn_submit.click()
+    # time.sleep(1)
     print('==============表单已提交')
 
 except Exception as ex:

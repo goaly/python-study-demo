@@ -51,21 +51,45 @@ class WorkLogTool:
         self.conn = pymysql.connect(host='localhost', user='root', passwd='Al4g56', db='dailylog', port=3306,
                                     charset='utf8')
 
-    def save_all_excel_to_db(self, dirpath):
+    def save_all_excel_to_db(self, dirpath, no_recur=True):
+        '''将指定目录下所有excel日志文件导入数据库'''
         filepath_lst = []
-        try:
-            for file in os.listdir(dirpath):
-                if os.path.splitext(file)[1] == '.xlsx' and not file.startswith('~$'):  # 过滤掉~$开头的临时文件
-                    fpath = os.path.join(dirpath, file)
-                    print(fpath)
+        if os.path.exists(dirpath):
+            if os.path.isfile(dirpath):
+                fpath = self.format_fpath(dirpath)
+                if fpath is not None:
                     filepath_lst.append(fpath)
-        except NotADirectoryError:
-            print(dirpath)
-            filepath_lst.append(dirpath)
-            pass  # pass掉NotADirectoryError错误
+            else:
+                if no_recur:
+                    # 不递归
+                    try:
+                        for file in os.listdir(dirpath):
+                            if os.path.splitext(file)[1] == '.xlsx' and not file.startswith('~$'):  # 过滤掉~$开头的临时文件
+                                fpath = os.path.join(dirpath, file)
+                                print(fpath)
+                                filepath_lst.append(fpath)
+                    except NotADirectoryError:
+                        print(dirpath)
+                        filepath_lst.append(dirpath)
+                        pass  # pass掉NotADirectoryError错误
+                else:
+                    # 递归
+                    for root, dirs, files in os.walk(dirpath, topdown=False):
+                        for name in files:
+                            file = os.path.join(root, name)
+                            fpath = self.format_fpath(file)
+                            if fpath is not None:
+                                filepath_lst.append(fpath)
 
         for filepath in filepath_lst:
             self.save_excel_to_db(filepath)
+
+    @staticmethod
+    def format_fpath(fpath):
+        if os.path.splitext(fpath)[1] == '.xlsx' and not os.path.split(fpath)[1].startswith('~$'):  # 过滤掉~$开头的临时文件
+            print(fpath)
+            return fpath
+        return None
 
     def save_excel_to_db(self, filepath):
         # 组装业务方法，将excel数据保存到数据库
