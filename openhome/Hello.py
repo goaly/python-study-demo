@@ -7,8 +7,14 @@ if __name__ == '__main__':
     print('Hello!', name, '!')
 
     # strip方法去除字符串两侧的空格
-    a = '!***python *is *good**!*@*!'
-    print(a.strip('*!'))
+    a = '    !***python *is *good**!*@*!  '
+    print(a.strip(' '))
 
-print('__name__:',__name__)
+    # import wheel.pep425tags as w
+    # print(w.get_supported(archive_root='C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python38'))
 
+    l_tuple = [(i,) for i in range(10)]
+
+    print(l_tuple)
+
+print('__name__:', __name__)
