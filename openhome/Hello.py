@@ -16,5 +16,4 @@ if __name__ == '__main__':
     l_tuple = [(i,) for i in range(10)]
 
     print(l_tuple)
-
-print('__name__:', __name__)
+    print('__name__:', __name__)
