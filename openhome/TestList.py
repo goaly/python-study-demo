@@ -10,6 +10,8 @@ word = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 a = word[2]
 print('a is : ' + a)
 b = word[1:3]
+
+# end=''作为print()的一个参数，会使该函数关闭“在输出中自动包含换行”的默认行为
 print('b is : ', end='')
 print(b)
 c = word[:2]
