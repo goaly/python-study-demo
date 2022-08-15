@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 import time
 
 headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 '
-                  'Safari/537.36'
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 '
+                  'Safari/537.36 '
 }
 
 
@@ -25,7 +25,7 @@ def get_info(url):
 
 if __name__ == '__main__':  # 为程序的主入口，单独运行时，才执行以下代码
     # 构造多页URL
-    urls = ['http://www.kugou.com/yy/rank/home/{}-8888.html'.format(str(i)) for i in range(1, 24)]
+    urls = ['http://www.kugou.com/yy/rank/home/{}-8888.html'.format(str(i)) for i in range(1, 10)]
     for i, single_url in enumerate(urls):
         print('==============酷狗TOP500，第', i + 1, '页===========> get_info(', single_url, ')')
         get_info(single_url)  # 循环调用get_info函数
