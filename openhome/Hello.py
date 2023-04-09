@@ -23,5 +23,5 @@ if __name__ == '__main__':
     brand_list = ['xiaomi', 'huawei', 'xiaomi']
     brand_set = set(brand_list)
     print('brand_list：', brand_list)
-    print('brand_set：', brand_set)
+    print('brand_set：', brand_set, '\n')
 
