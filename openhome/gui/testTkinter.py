@@ -3,13 +3,13 @@ import tkinter
 
 
 def set_win_center(root, curWidth='', curHight=''):
-    '''
+    """
     设置窗口大小，并居中显示
     :param root:主窗体实例
     :param curWidth:窗口宽度，非必填，默认200
     :param curHight:窗口高度，非必填，默认200
     :return:无
-    '''
+    """
 
     if not curWidth:
         '''获取窗口宽度，默认200'''
