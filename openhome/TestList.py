@@ -11,31 +11,34 @@ a = word[2]
 print('a is : ' + a)
 b = word[1:3]
 
-# end=''作为print()的一个参数，会使该函数关闭“在输出中自动包含换行”的默认行为
-print('b is : ', end='')
-print(b)
-c = word[:2]
-print("c is: ", end='')
-print(c)
-d = word[1:]
-print("d is: ", end='')
-print(d)
-# 元组可以合并
-e = word[:2] + word[2:]
-print("e is: ")
-print(e)
-f = word[-1]
-print("f is: ", end='')
-print(f)  # The last elements of word.
-h = word[-2:]
-print("h is: ")
-print(h)  # The last two elements.
-i = word[:-2]
-print("i is: ")
-print(i)  # Everything except the last two characters
+# # end=''作为print()的一个参数，会使该函数关闭“在输出中自动包含换行”的默认行为
+# print('b is : ', end='')
+# print(b)
+# c = word[:2]
+# print("c is: ", end='')
+# print(c)
+# d = word[1:]
+# print("d is: ", end='')
+# print(d)
 
-l = len(word)
-print("Length of word is: " + str(l))
+# 列表可以合并
+e = word[:2] + word[2:]
+print("列表可以合并 e = word[:2] + word[2:] is:", e)
+
+# The last elements of word.
+f = word[-1]
+print("word[-1] is:", f)
+
+# The last two elements.
+h = word[-2:]
+print("word[-2:] is:", h)
+
+# Everything except the last two characters
+i = word[:-2]
+print("Everything except the last two characters word[:-2] ->", i)
+
+length = len(word)
+print("Length of word is: " + str(length))
 print("Adds new element 'h'")
 word.append('h')
 print(word)
