@@ -3,7 +3,7 @@ class Bike:
     compose = ['frame', 'wheel', 'pedal']
 
     def __init__(self):
-        '''默认的初始化方法'''
+        """默认的初始化方法"""
         self.other = 'seat'
 
     def use(self, distance):
@@ -11,8 +11,10 @@ class Bike:
 
 
 # 类的继承
+
+
 class ShareBike(Bike):
-    '''共享单车'''
+    """共享单车"""
     price = 1.2
 
     def cost(self, hour):
