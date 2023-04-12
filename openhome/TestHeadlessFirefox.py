@@ -5,23 +5,26 @@ import re
 import datetime
 import time
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 # 导入 WebDriverWait 包
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.firefox.service import Service
 
 caps = webdriver.DesiredCapabilities().FIREFOX
 # （从Firefox 48开始）的每个版本，其中属性marionette需要设置为true（默认或通过配置）
 # 如果您使用的是旧版Firefox版本（直到Firefox 47.x），GeckoDriver仍然可以使用，但是必须将属性marionette显式设置为false
 # caps["marionette"] = False
-binary = FirefoxBinary('C:/Program Files/Mozilla Firefox/firefox.exe',
-                       log_file=open('D:/360极速浏览器下载/FirefoxBinary.log', 'wb'))
-driver = webdriver.Firefox(firefox_binary=binary, capabilities=caps, timeout=60)
 
-# driver = webdriver.PhantomJS()
+foxOptions = webdriver.FirefoxOptions()
+foxOptions.binary = FirefoxBinary('C:/Program Files/Mozilla Firefox/firefox.exe',
+                                  log_file=open('D:/360极速浏览器下载/FirefoxBinary.log', 'wb'))
+driverService = Service()
+driver = webdriver.Firefox(options=foxOptions, service=driverService)
+# driver = webdriver.Firefox(options=foxOptions, capabilities=caps)
 
-# driver.get("https://www.baidu.com")
 driver.get("https://search.douban.com/book/subject_search?search_text=python&cat=1001&start=0")
 
 # 爬取页数
@@ -35,7 +38,7 @@ now_time_stamp = datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S.%f')
 
 # 显示等待，WebDriverWait()方法使用
 # WebDriverWait(driver, 3).until(
-#     lambda driver: driver.find_elements_by_xpath('//div[@class="item-root"]/div[@class="detail"]'))
+#     lambda driver: driver.find_elements(By.XPATH, '//div[@class="item-root"]/div[@class="detail"]'))
 
 
 # 逐渐滚动浏览器窗口，令ajax逐渐加载
@@ -47,7 +50,7 @@ now_time_stamp = datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S.%f')
 # 最大化窗口
 def maximize_window():
     # 最大化显示宽度
-    if driver.find_element_by_tag_name('body'):
+    if driver.find_element(By.TAG_NAME, 'body'):
         width = driver.execute_script(
             "return Math.max(document.body.scrollWidth, document.body.offsetWidth, "
             "document.documentElement.clientWidth, document.documentElement.scrollWidth, "
@@ -62,14 +65,14 @@ def maximize_window():
 # 获取当前页的图书数据
 def get_curpage_data():
     page_data = []
-    infos = driver.find_elements_by_xpath('//div[@class="item-root"]/div[@class="detail"]')
+    infos = driver.find_elements(By.XPATH, '//div[@class="item-root"]/div[@class="detail"]')
     for info in infos:
-        str_book_info = info.find_element_by_xpath('div[@class="meta abstract"]').text
+        str_book_info = info.find_element(By.XPATH, 'div[@class="meta abstract"]').text
         book_infos = str_book_info.split('/')
         if len(book_infos) < 4:
             continue
 
-        title = info.find_element_by_xpath('div[@class="title"]/a')
+        title = info.find_element(By.XPATH, 'div[@class="title"]/a')
         url = title.get_attribute('href')
         name = title.text
 
@@ -82,14 +85,14 @@ def get_curpage_data():
         publisher = ''
         if len(book_infos) == 5:
             publisher = book_infos[-3]
-        rating_sub_spans = info.find_elements_by_xpath('div[2]/span')
+        rating_sub_spans = info.find_elements(By.XPATH, 'div[2]/span')
         if len(rating_sub_spans) == 3:
-            rate = info.find_element_by_xpath('div[2]/span[2]').text
-            comment_num = info.find_element_by_xpath('div[2]/span[3]').text
+            rate = info.find_element(By.XPATH, 'div[2]/span[2]').text
+            comment_num = info.find_element(By.XPATH, 'div[2]/span[3]').text
         else:
             # 评论人数不足
             rate = ''
-            comment_num = info.find_element_by_xpath('div[2]/span[2]').text
+            comment_num = info.find_element(By.XPATH, 'div[2]/span[2]').text
 
         print(name, url, author, publisher, pub_date, price, rate, comment_num)
         info_data = [name, url, author, publisher, pub_date, price, rate, comment_num]
@@ -145,7 +148,7 @@ try:
     maximize_window()
     # 截屏
     driver.save_screenshot(
-        'D:/360极速浏览器下载/screenshot_' + now_time_stamp + '.png')
+        'D:/360极速浏览器下载/firefox_screenshot_' + now_time_stamp + '.png')
 
     # 打印网页源代码
     # print(driver.page_source, '\n')
@@ -172,7 +175,7 @@ try:
                 rowIdx += 1
         n += 1
         if n <= pageCount:
-            next_link = driver.find_element_by_css_selector('div.paginator > a.next')
+            next_link = driver.find_element(By.CSS_SELECTOR, 'div.paginator > a.next')
             print('\n==============================准备跳转第', n, '页：', next_link.get_attribute('href'))
             next_link.click()
             driver.implicitly_wait(3)
