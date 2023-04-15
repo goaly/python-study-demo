@@ -13,13 +13,6 @@ headers = {
 context_path = 'https://www.guozaoke.com'
 
 
-def judgement_sex(class_name):
-    if class_name == ['womenIcon']:
-        return '女'
-    else:
-        return '男'
-
-
 def xpath_scraper(url):
     print('\nurl:' + url)
     res = requests.get(url, headers=headers)
