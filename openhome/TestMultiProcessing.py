@@ -7,6 +7,8 @@ import datetime
 from lxml import etree
 from multiprocessing import Pool  # 导入相应的库文件
 from multiprocessing import Manager, Lock
+import itertools
+from functools import partial
 
 http_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 '
@@ -15,9 +17,9 @@ http_headers = {
 
 context_path = 'https://www.guozaoke.com'
 LOCK = Lock()
-sheet_data = []
 
-def xpath_scraper(url):
+
+def xpath_scraper(page_data_container, url):
     page_data = []
     print('\nurl:' + url)
     res = requests.get(url, headers=http_headers)
@@ -32,7 +34,7 @@ def xpath_scraper(url):
         info_data = [node, title, user_name, link]
         page_data.append(info_data)
     with LOCK:
-        sheet_data.append(page_data)
+        page_data_container.append(page_data)
 
 
 def init_workbook(headers):
@@ -73,7 +75,7 @@ def get_col_width(txt):
 if __name__ == '__main__':
 
     # 当多进程的代码不在 if "__name__"=="__main__"中时，报错
-    sheet_data = Manager().list()
+    sheet_data_lst = Manager().list()
 
     urls = ['https://www.guozaoke.com/?tab=latest&p={}'.format(str(i)) for i in range(1, 5)]
 
@@ -84,12 +86,15 @@ if __name__ == '__main__':
     # print('串行爬虫', end_1 - start_1)
 
     start_3 = time.time()
-    pool = Pool(processes=4)  # 4个进程
-    pool.map(xpath_scraper, urls)
+    # 转换成一个参数的函数
+    func_arg_1 = partial(xpath_scraper, sheet_data_lst)
+    process_count = 4
+    pool = Pool(processes=process_count)  # 无参数时，使用所有cpu核
+    pool.map(func_arg_1, urls)
     pool.close()
     pool.join()
     end_3 = time.time()
-    print('4个进程', end_3 - start_3)
+    print('%d个进程' % process_count, end_3 - start_3)
 
     headers = ['节点', '标题', '发布人', '链接']
     col_default_w = 256 * 11
@@ -101,7 +106,7 @@ if __name__ == '__main__':
     # 设置链接字体颜色
     style_link_color = xlwt.easyxf('font:colour_index blue')
     row_idx = 1
-    for page_data in sheet_data:
+    for page_data in sheet_data_lst:
         for row_data in page_data:
             for j, cellData in enumerate(row_data):
                 new_col_w = get_col_width(cellData)
