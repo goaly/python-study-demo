@@ -6,6 +6,7 @@ import datetime
 
 from lxml import etree
 from multiprocessing import Pool  # 导入相应的库文件
+from multiprocessing import Manager, Lock
 
 http_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 '
@@ -13,8 +14,8 @@ http_headers = {
 }
 
 context_path = 'https://www.guozaoke.com'
+LOCK = Lock()
 sheet_data = []
-
 
 def xpath_scraper(url):
     page_data = []
@@ -30,8 +31,8 @@ def xpath_scraper(url):
         print('【%s】' % node, title, 'by', user_name, link)
         info_data = [node, title, user_name, link]
         page_data.append(info_data)
-    global sheet_data
-    sheet_data.append(page_data)
+    with LOCK:
+        sheet_data.append(page_data)
 
 
 def init_workbook(headers):
@@ -70,19 +71,25 @@ def get_col_width(txt):
 
 
 if __name__ == '__main__':
+
+    # 当多进程的代码不在 if "__name__"=="__main__"中时，报错
+    sheet_data = Manager().list()
+
     urls = ['https://www.guozaoke.com/?tab=latest&p={}'.format(str(i)) for i in range(1, 5)]
 
-    start_1 = time.time()
-    for url in urls:
-        xpath_scraper(url)  # 单进程
-    end_1 = time.time()
-    print('串行爬虫', end_1 - start_1)
+    # start_1 = time.time()
+    # for url in urls:
+    #     xpath_scraper(url)  # 单进程
+    # end_1 = time.time()
+    # print('串行爬虫', end_1 - start_1)
 
-    # start_3 = time.time()
-    # pool = Pool(processes=4)  # 4个进程
-    # pool.map(xpath_scraper, urls)
-    # end_3 = time.time()
-    # print('4个进程', end_3 - start_3)
+    start_3 = time.time()
+    pool = Pool(processes=4)  # 4个进程
+    pool.map(xpath_scraper, urls)
+    pool.close()
+    pool.join()
+    end_3 = time.time()
+    print('4个进程', end_3 - start_3)
 
     headers = ['节点', '标题', '发布人', '链接']
     col_default_w = 256 * 11
