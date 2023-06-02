@@ -4,7 +4,8 @@ dashscope.api_key = 'NPThLfdqldcktJXQBU32ySMbvhE3h8DGEAAE0671D82B11ED8FD24A6A8A0
 
 #'Allocated quota exceeded, please increase your quota limit.'
 def sample_call_streaming():
-    prompt_text = '用萝卜、土豆、茄子做饭，给我个菜谱。'
+    # prompt_text = '用萝卜、土豆、茄子做饭，给我个菜谱。'
+    prompt_text = '麻辣小龙虾怎么做？'
     response_generator = dashscope.aigc.Generation.call(
         model='qwen-v1',
         prompt=prompt_text,
