@@ -155,6 +155,6 @@ if __name__ == '__main__':
     print('%d 个进程抓取到 %d 条数据，耗时 %.3f 秒' %(process_count, len(sheet_data_lst), end_1 - start_1))
 
     now_time_stamp = datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S')
-    save_path = 'D:/360极速浏览器下载/guozaoke_job_needs_' + now_time_stamp + '.xls'
+    save_path = 'D:/360极速浏览器下载/guozaoke_search_result_' + now_time_stamp + '.xls'
     save_to_workbook(save_path, sheet_data_lst)
 
