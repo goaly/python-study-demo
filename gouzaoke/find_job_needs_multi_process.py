@@ -1,15 +1,15 @@
+import datetime
+import time
+from functools import partial
+from multiprocessing import Manager, Lock
+from multiprocessing import Pool  # 导入相应的库文件
+
+import re
 import requests
 import xlwt
-import time
-import datetime
-
 from lxml import etree
-from multiprocessing import Pool  # 导入相应的库文件
-from multiprocessing import Manager, Lock
-import itertools
-from functools import partial
 
-"""多进程查找 过早客 -> 找工作节点，前20页求职需求"""
+"""多进程查找 过早客 """
 
 http_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 '
@@ -29,9 +29,6 @@ http_headers = {
 }
 
 context_path = 'https://www.guozaoke.com'
-LOCK = Lock()
-keywords = ['科学上网', '外网', '梯子', 'VPN', 'vpn']
-
 
 def xpath_scraper(page_data_container, url):
     page_data = []
@@ -40,7 +37,9 @@ def xpath_scraper(page_data_container, url):
     html = etree.HTML(res.text)
     topic_items = html.xpath('//div[@class="topic-item"]')
     for item in topic_items:
-        node = item.xpath('div[@class="main"]/div[@class="meta"]/span[@class="node"]/a/text()')[0]
+        item_node = item.xpath('div[@class="main"]/div[@class="meta"]/span[@class="node"]/a')[0]
+        node_text = item_node.xpath('text()')[0]
+        node = re.sub('/node/', '', item_node.xpath('@href')[0])
         user_name = item.xpath('div[@class="main"]/div[@class="meta"]/span[@class="username"]/a/text()')[0]
         title = item.xpath('div[@class="main"]/h3[@class="title"]/a/text()')[0]
         link = context_path + item.xpath('div[@class="main"]/h3[@class="title"]/a/@href')[0]
@@ -48,13 +47,15 @@ def xpath_scraper(page_data_container, url):
         # 查找求职贴
         is_matched = False
         for key_str in keywords:
-            if title.find(key_str) != -1:
-                is_matched = True
+            # 忽略大小写匹配
+            is_matched = bool(re.search(key_str, title, re.IGNORECASE))
+            if is_matched:
                 break
 
         if is_matched:
-            print('【%s】' % node, title, 'by', user_name, link)
-            info_data = [node, title, user_name, link]
+            node_info = node_text + ' - ' + node
+            print('【%s】' % node_info, title, 'by', user_name, link)
+            info_data = [node_info, title, user_name, link]
             page_data.append(info_data)
     if len(page_data) > 0:
         with LOCK:
@@ -95,10 +96,12 @@ def get_col_width(txt):
         col_w = (col_w - zh_char_num) + zh_char_num * 2
     return 256 * col_w
 
-
 def save_to_workbook(save_path, sheet_data_lst):
+    """将抓到的数据保存到指定路径的Excel文件中"""
+    data_count = 0
     if len(sheet_data_lst) == 0:
-        return
+        return data_count
+
     headers = ['节点', '标题', '发布人', '链接']
     col_default_w = 256 * 11
     col_widths = []
@@ -111,6 +114,7 @@ def save_to_workbook(save_path, sheet_data_lst):
     row_idx = 1
     for page_data in sheet_data_lst:
         for row_data in page_data:
+            data_count += 1
             for j, cellData in enumerate(row_data):
                 new_col_w = get_col_width(cellData)
                 if new_col_w > col_widths[j]:
@@ -128,17 +132,27 @@ def save_to_workbook(save_path, sheet_data_lst):
         sheet.col(i).width = col_w
     workbook.save(save_path)
     print('数据成功保存到: %s' % save_path)
+    return data_count
 
+LOCK = Lock()
+# 版块
+# node_type = ''
+# node_type = 'job'
+node_type = 'IT'
+# 搜索关键字
+keywords = ['科学上网', 'vpn', '梯子']
+# 页数上限
+pg_limit = 50
 
 if __name__ == '__main__':
 
     # 当多进程的代码不在 if "__name__"=="__main__"中时，报错
     sheet_data_lst = Manager().list()
-
-    urls = ['https://www.guozaoke.com/node/job?p={}'.format(str(i)) for i in range(1, 40)]
+    node_path = '/node/' + node_type if len(node_type) > 0 else ''
+    urls = ['https://www.guozaoke.com{}?p={}'.format(node_path, str(i)) for i in range(1, pg_limit)]
 
     start_1 = time.time()
-    process_count = 4
+    process_count = 1
     if process_count > 1:
         # 多进程
         # 柯里化 xpath_scraper - 转换成一个参数的函数
@@ -152,9 +166,8 @@ if __name__ == '__main__':
         for url in urls:
             xpath_scraper(sheet_data_lst, url)
     end_1 = time.time()
-    print('%d 个进程抓取到 %d 条数据，耗时 %.3f 秒' %(process_count, len(sheet_data_lst), end_1 - start_1))
 
     now_time_stamp = datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S')
     save_path = 'D:/360极速浏览器下载/guozaoke_search_result_' + now_time_stamp + '.xls'
-    save_to_workbook(save_path, sheet_data_lst)
-
+    data_count = save_to_workbook(save_path, sheet_data_lst)
+    print('\n%d 进程搜索 %d 个页面，共抓取到 %d 条数据，耗时 %.3f 秒' % (process_count, pg_limit, data_count, end_1 - start_1))
