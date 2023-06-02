@@ -14,21 +14,23 @@ from functools import partial
 http_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 '
                   'Safari/537.36 ',
-    'Cookie': '_xsrf=6df79b59b371499fa4a7cf229ba613aa; _ga=GA1.2.715178160.1681827717; '
-              '_gid=GA1.2.492443347.1681827717; '
-              '__gads=ID=291f53cfd4ff54b5-22ff53b431df0012:T=1681827717:RT=1681827717:S=ALNI_Ma0NWPJ-esJQAJk'
-              '-JvSPaFpf94IIg; __gpi=UID=00000bf7c7504f8f:T=1681827717:RT=1681827717:S'
-              '=ALNI_Ma36yWFrBSQvtw7EfeoOKVJMuKP-A; '
-              'verification="ODgzZjY4ZWU2MWJhNDc0ZjI1MzExZDM0NTZkNjVmN2IzOTYxMThjZTI1NzRmYTgxY2I4ZDc3ZjViMGQ2MTQ1YQ'
-              '==|1681827733|68b371dc1684df8395602400394fecb570aded6f"; '
-              'session_id="MTA0NmFlMDVkMmE2Mzg2YjliMmFkZmM0YjZmZmZiYWE0ZTZkMzFkMjhiMDc3MDcxNDRhZGQxYzk2NmFkMzFjZg'
-              '==|1681827733|e0ac6d3f2bb87e8638fdcbd363255c91762f229a"; '
-              'user="NzQxODY=|1681827733|7edced265b01d6016947c7796be6ba5aba2a2275"; _gat_gtag_UA_47580304_4=1 '
+    'Cookie': '_ga=GA1.1.1740914313.1685604234; _xsrf=0915f9eefb7c4a40a42f5106dcaa65a9; '
+              'verification="MWNjZDdhNDc4YzRlYzIyMDBmYmM4OTE5OTMzMWRlNWFkM2M4ZThhZTZkMDg2M2U0M2MzMjI5NmI4NmMxYzYzZg'
+              '==|1685604249|a8032618a4477a06231810b6c89871da51b67550"; '
+              'session_id="ZjJhODMzMWMzZjE0OGRjNDNhNWJlMjNlNDBkZDM0ZTNiNGQ2NmYyMGQyODMwMWZmZjNkZWVjYjA5MjRhMmRjZg'
+              '==|1685604249|7382d2b2b50982e7cfdd623dbcc05eb559d4d46b"; '
+              'user="NzQxODY=|1685604249|d84b8c488860c98c51dd9018aad45d5473921741"; _dx_captcha_cid=99275097; '
+              '_dx_uzZo5y=563409320f9849198f390ffa3e27ae2c4cf1273ef3f37d26bf3fb6bb308a28336c7ef3e2; '
+              '_dx_FMrPY6=6478479abFmZilPXdE9a5QeXVTEgLt7Uhol3xpd1; '
+              '__gads=ID=2fbcc3e35579384d-2276f1faaee10018:T=1685604234:RT=1685686781:S'
+              '=ALNI_MboGfjxkDyzgno5LcQFmbPPWmArUw; '
+              '__gpi=UID=00000c0db7ca89a4:T=1685604234:RT=1685686781:S=ALNI_MaarLECeOZiXEQkDdYHIUy-337ELg; '
+              '_ga_YTS4ZXTQK4=GS1.1.1685685724.3.1.1685686820.21.0.0 '
 }
 
 context_path = 'https://www.guozaoke.com'
 LOCK = Lock()
-keywords = ['前端', 'js', 'vue', 'react', 'javascript']
+keywords = ['java', '招聘']
 
 
 def xpath_scraper(page_data_container, url):
@@ -44,18 +46,19 @@ def xpath_scraper(page_data_container, url):
         link = context_path + item.xpath('div[@class="main"]/h3[@class="title"]/a/@href')[0]
 
         # 查找求职贴
-        is_job = False
+        is_matched = False
         for key_str in keywords:
             if title.find(key_str) != -1:
-                is_job = True
+                is_matched = True
                 break
 
-        if is_job:
+        if is_matched:
             print('【%s】' % node, title, 'by', user_name, link)
             info_data = [node, title, user_name, link]
             page_data.append(info_data)
-    with LOCK:
-        page_data_container.append(page_data)
+    if len(page_data) > 0:
+        with LOCK:
+            page_data_container.append(page_data)
 
 
 def init_workbook(headers):
@@ -93,30 +96,9 @@ def get_col_width(txt):
     return 256 * col_w
 
 
-if __name__ == '__main__':
-
-    # 当多进程的代码不在 if "__name__"=="__main__"中时，报错
-    sheet_data_lst = Manager().list()
-
-    urls = ['https://www.guozaoke.com/node/job?p={}'.format(str(i)) for i in range(1, 20)]
-
-    # start_1 = time.time()
-    # for url in urls:
-    #     xpath_scraper(url)  # 单进程
-    # end_1 = time.time()
-    # print('串行爬虫', end_1 - start_1)
-
-    start_3 = time.time()
-    # 转换成一个参数的函数
-    func_arg_1 = partial(xpath_scraper, sheet_data_lst)
-    process_count = 4
-    pool = Pool(processes=process_count)  # 无参数时，使用所有cpu核
-    pool.map(func_arg_1, urls)
-    pool.close()
-    pool.join()
-    end_3 = time.time()
-    print('%d个进程' % process_count, end_3 - start_3)
-
+def save_to_workbook(save_path, sheet_data_lst):
+    if len(sheet_data_lst) == 0:
+        return
     headers = ['节点', '标题', '发布人', '链接']
     col_default_w = 256 * 11
     col_widths = []
@@ -144,5 +126,35 @@ if __name__ == '__main__':
     # 设置列宽
     for i, col_w in enumerate(col_widths):
         sheet.col(i).width = col_w
+    workbook.save(save_path)
+    print('数据成功保存到: %s' % save_path)
+
+
+if __name__ == '__main__':
+
+    # 当多进程的代码不在 if "__name__"=="__main__"中时，报错
+    sheet_data_lst = Manager().list()
+
+    urls = ['https://www.guozaoke.com/node/job?p={}'.format(str(i)) for i in range(1, 40)]
+
+    start_1 = time.time()
+    process_count = 4
+    if process_count > 1:
+        # 多进程
+        # 柯里化 xpath_scraper - 转换成一个参数的函数
+        func_arg_1 = partial(xpath_scraper, sheet_data_lst)
+        pool = Pool(processes=process_count)  # 无参数时，使用所有cpu核
+        pool.map(func_arg_1, urls)
+        pool.close()
+        pool.join()
+    else:
+        # 单进程
+        for url in urls:
+            xpath_scraper(sheet_data_lst, url)
+    end_1 = time.time()
+    print('%d 个进程抓取到 %d 条数据，耗时 %.3f 秒' %(process_count, len(sheet_data_lst), end_1 - start_1))
+
     now_time_stamp = datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S')
-    workbook.save('D:/360极速浏览器下载/guozaoke_job_needs_' + now_time_stamp + '.xls')
+    save_path = 'D:/360极速浏览器下载/guozaoke_search_result_' + now_time_stamp + '.xls'
+    save_to_workbook(save_path, sheet_data_lst)
+
