@@ -140,7 +140,7 @@ LOCK = Lock()
 # node_type = 'job'
 node_type = 'IT'
 # 搜索关键字
-keywords = ['科学上网', 'vpn', '梯子']
+keywords = ['魔法', '代理']
 # 页数上限
 pg_limit = 50
 
