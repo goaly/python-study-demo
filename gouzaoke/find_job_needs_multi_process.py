@@ -30,7 +30,7 @@ http_headers = {
 
 context_path = 'https://www.guozaoke.com'
 LOCK = Lock()
-keywords = ['武汉']
+keywords = ['科学上网', '外网', '梯子', 'VPN', 'vpn']
 
 
 def xpath_scraper(page_data_container, url):
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # 当多进程的代码不在 if "__name__"=="__main__"中时，报错
     sheet_data_lst = Manager().list()
 
-    urls = ['https://www.guozaoke.com/node/job?p={}'.format(str(i)) for i in range(1, 20)]
+    urls = ['https://www.guozaoke.com/node/job?p={}'.format(str(i)) for i in range(1, 40)]
 
     start_1 = time.time()
     process_count = 4
