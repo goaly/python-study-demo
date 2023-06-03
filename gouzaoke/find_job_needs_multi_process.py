@@ -152,7 +152,7 @@ if __name__ == '__main__':
     urls = ['https://www.guozaoke.com{}?p={}'.format(node_path, str(i)) for i in range(1, pg_limit)]
 
     start_1 = time.time()
-    process_count = 1
+    process_count = 4
     if process_count > 1:
         # 多进程
         # 柯里化 xpath_scraper - 转换成一个参数的函数
