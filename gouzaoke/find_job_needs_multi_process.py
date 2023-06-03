@@ -31,6 +31,7 @@ http_headers = {
 context_path = 'https://www.guozaoke.com'
 
 def xpath_scraper(page_data_container, url):
+    """xpath解析器"""
     page_data = []
     print('\nurl:' + url)
     res = requests.get(url, headers=http_headers)
