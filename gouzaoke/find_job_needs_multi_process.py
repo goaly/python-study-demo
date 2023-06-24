@@ -30,6 +30,7 @@ http_headers = {
 
 context_path = 'https://www.guozaoke.com'
 
+
 def xpath_scraper(page_data_container, url):
     """xpath解析器"""
     page_data = []
@@ -97,6 +98,7 @@ def get_col_width(txt):
         col_w = (col_w - zh_char_num) + zh_char_num * 2
     return 256 * col_w
 
+
 def save_to_workbook(save_path, sheet_data_lst):
     """将抓到的数据保存到指定路径的Excel文件中"""
     data_count = 0
@@ -135,6 +137,7 @@ def save_to_workbook(save_path, sheet_data_lst):
     print('数据成功保存到: %s' % save_path)
     return data_count
 
+
 LOCK = Lock()
 # 版块
 # node_type = ''
@@ -171,4 +174,5 @@ if __name__ == '__main__':
     now_time_stamp = datetime.datetime.now().strftime('%Y-%m-%d-%H_%M_%S')
     save_path = 'D:/360极速浏览器下载/guozaoke_search_result_' + now_time_stamp + '.xls'
     data_count = save_to_workbook(save_path, sheet_data_lst)
-    print('\n%d 进程搜索 %d 个页面，共抓取到 %d 条数据，耗时 %.3f 秒' % (process_count, pg_limit, data_count, end_1 - start_1))
+    print('\n%d 进程搜索 %d 个页面，共抓取到 %d 条数据，耗时 %.3f 秒' % (
+    process_count, pg_limit, data_count, end_1 - start_1))
