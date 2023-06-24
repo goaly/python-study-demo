@@ -45,7 +45,7 @@ def xpath_scraper(page_data_container, url):
         title = item.xpath('div[@class="main"]/h3[@class="title"]/a/text()')[0]
         link = context_path + item.xpath('div[@class="main"]/h3[@class="title"]/a/@href')[0]
 
-        # 查找求职贴
+        # 查找关键字
         is_matched = False
         for key_str in keywords:
             # 忽略大小写匹配
