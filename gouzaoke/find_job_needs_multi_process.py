@@ -146,7 +146,7 @@ node_type = 'IT'
 # 搜索关键字
 keywords = ['魔法', '代理']
 # 页数上限
-pg_limit = 50
+pg_limit = 20
 
 if __name__ == '__main__':
 
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     urls = ['https://www.guozaoke.com{}?p={}'.format(node_path, str(i)) for i in range(1, pg_limit)]
 
     start_1 = time.time()
-    process_count = 4
+    process_count = 1
     if process_count > 1:
         # 多进程
         # 柯里化 xpath_scraper - 转换成一个参数的函数
