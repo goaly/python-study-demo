@@ -129,11 +129,10 @@ def main(appid, api_key, api_secret, gpt_url, question):
     ws.question = question
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
-
 if __name__ == "__main__":
     # 测试时候在此处正确填写相关信息即可运行
-    main(appid="",
-         api_key="",
-         api_secret="",
-         gpt_url="",
-         question="你是谁？你能做什么？")
+    main(appid="98053342",
+         api_key="97153b2bd678d1086e742612e462cd9d",
+         api_secret="ZjAzY2RmZDc5NDhkM2RiN2JiNzQ0MDZj",
+         gpt_url="ws://spark-api.xf-yun.com/v1.1/chat",
+         question="TTransferController#getTransferInfoByPrimaryKey(Integer fid):TTransferDTO, TTransferDTO属性:fid,ftype,fbillid 为此方法生成springboot下的单元测试")
