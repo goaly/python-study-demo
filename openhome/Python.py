@@ -1,4 +1,4 @@
-def getNum(n):
+def get_num(n):
     print("执行程序")
     i = 0
     while i < n:
@@ -7,8 +7,7 @@ def getNum(n):
         i += 1
 
 
-a = getNum(5)
+a = get_num(3)
 print(next(a))
 print(a.send("yield测试"))
-print(a.__next__())
 print(a.__next__())
